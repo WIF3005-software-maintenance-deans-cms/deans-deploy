@@ -22,6 +22,16 @@ services:
       - default.env
     networks: 
       - db_network
+    environment:
+      POSTGRES_PASSWORD: password
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks: 
+      - db_network
+
   redis:
     image: redis:2.8
     command: redis-server
@@ -32,7 +42,6 @@ services:
   web:
     build:
       context: ./deans-api
-    image: django_image
     entrypoint: "start_django.sh"
     env_file:
       - default.env
@@ -51,7 +60,6 @@ services:
   notification:
     build:
       context: ./deans-notification
-    image: notification_image
     entrypoint: "start_server.sh"
     # command: "python -c \"while True: pass\""
     # ports:
@@ -62,14 +70,20 @@ services:
       - ./deans-notification:/work
     networks:
       - notification_network
-  # frontend:
-  #   build:
-  #     context: ./deans-frontend
-  #   image: frontend_image
-  #   networks:
-  #     - frontend_network
-  #   ports:
-  #     - 3000:3000
+
+  frontend:
+    build: ./deans-frontend
+    ports:
+    - "3000:3000"
+    expose:
+      - 3000
+    volumes:
+     - ./deans-frontend:/work/
+    command: bash -c "yarn install; yarn start"
+    networks: 
+    #   - frontend_network
+      - nginx_network
+
   nginx:
     build:
       context: ./nginx
@@ -88,7 +102,7 @@ services:
     networks:
       - nginx_network
   cron:
-    image: django_image
+    image: python:3.6
     command: bash -c "python3 /cron/cron.py"
     env_file:
       - default.env
@@ -105,18 +119,3 @@ volumes:
   static_volume:
 
 
-
-
-      # node:
-  #   build: ./deans-frontend
-  #   ports:
-  #   - "3000:3000"
-  #   expose:
-  #     - 3000
-  #   volumes:
-  #    - ./deans-frontend:/work/
-  #   ports:
-  #     - "3000"
-  #   command: bash -c "yarn install; yarn start"
-  #   networks: 
-  #     - nginx_network
