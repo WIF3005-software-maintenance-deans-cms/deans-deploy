@@ -22,6 +22,8 @@ services:
       - default.env
     networks: 
       - db_network
+    volumes:
+      - ./tidb:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
   adminer:
@@ -57,19 +59,19 @@ services:
       - nginx_network
       - notification_network
       - redis_network
-  notification:
-    build:
-      context: ./deans-notification
-    entrypoint: "start_server.sh"
-    # command: "python -c \"while True: pass\""
-    # ports:
-    #   - "8000:3000"
-    env_file:
-      - default.env
-    volumes:
-      - ./deans-notification:/work
-    networks:
-      - notification_network
+#   notification:
+#     build:
+#       context: ./deans-notification
+#     entrypoint: "start_server.sh"
+#     # command: "python -c \"while True: pass\""
+#     # ports:
+#     #   - "8000:3000"
+#     env_file:
+#       - default.env
+#     volumes:
+#       - ./deans-notification:/work
+#     networks:
+#       - notification_network
 
   frontend:
     build: ./deans-frontend
@@ -101,19 +103,19 @@ services:
       # - node
     networks:
       - nginx_network
-  cron:
-    image: python:3.6
-    command: bash -c "python3 /cron/cron.py"
-    env_file:
-      - default.env
-    volumes:
-      - ./cron:/cron
-      - ./deans-api/deans_api:/work/deans-api/deans_api
-    depends_on:
-      - web
-    networks:
-      - notification_network
-      - db_network
+#   cron:
+#     image: python:3.6
+#     command: bash -c "python3 /cron/cron.py"
+#     env_file:
+#       - default.env
+#     volumes:
+#       - ./cron:/cron
+#       - ./deans-api/deans_api:/work/deans-api/deans_api
+#     depends_on:
+#       - web
+#     networks:
+#       - notification_network
+#       - db_network
 
 volumes:
   static_volume:
