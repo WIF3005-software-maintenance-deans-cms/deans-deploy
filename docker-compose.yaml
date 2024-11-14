@@ -1,123 +1,120 @@
-version: '3'
+version: "3"
 
 networks:
-  nginx_network:
-    driver: bridge
-  db_network:
-    driver: bridge
-  notification_network:
-    driver: bridge
-  redis_network:
-    driver: bridge
-  # frontend_network:
-  #   driver: bridge
-
+    nginx_network:
+        driver: bridge
+    db_network:
+        driver: bridge
+    notification_network:
+        driver: bridge
+    redis_network:
+        driver: bridge
+    # frontend_network:
+    #   driver: bridge
 
 services:
-  db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    env_file:
-      - default.env
-    networks: 
-      - db_network
-    volumes:
-      - ./tidb:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: password
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    networks: 
-      - db_network
+    db:
+        image: postgres
+        ports:
+            - "5432:5432"
+        env_file:
+            - default.env
+        networks:
+            - db_network
+        volumes:
+            - ./tidb:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: password
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+        networks:
+            - db_network
 
-  redis:
-    image: redis:2.8
-    command: redis-server
-    ports:
-      - "6379:6379"
-    networks: 
-      - redis_network
-  web:
-    build:
-      context: ./deans-api
-    entrypoint: "start_django.sh"
-    env_file:
-      - default.env
-    volumes:
-      - ./deans-api/data:/data
-      - ./deans-api/deans_api:/work/deans-api/deans_api
-      - static_volume:/static-django
-    depends_on:
-      - db
-      - redis
-    networks: 
-      - db_network
-      - nginx_network
-      - notification_network
-      - redis_network
-#   notification:
-#     build:
-#       context: ./deans-notification
-#     entrypoint: "start_server.sh"
-#     # command: "python -c \"while True: pass\""
-#     # ports:
-#     #   - "8000:3000"
-#     env_file:
-#       - default.env
-#     volumes:
-#       - ./deans-notification:/work
-#     networks:
-#       - notification_network
+    redis:
+        image: redis:2.8
+        command: redis-server
+        ports:
+            - "6379:6379"
+        networks:
+            - redis_network
+    web:
+        build:
+            context: ./deans-api
+        entrypoint: "start_django.sh"
+        env_file:
+            - default.env
+        volumes:
+            - ./deans-api/data:/data
+            - ./deans-api/deans_api:/work/deans-api/deans_api
+            - static_volume:/static-django
+        depends_on:
+            - db
+        #   - redis
+        networks:
+            - db_network
+            - nginx_network
+            - notification_network
+            - redis_network
+    # notification:
+    #     build:
+    #         context: ./deans-notification
+    #     entrypoint: "start_server.sh"
+    #     # command: "python -c \"while True: pass\""
+    #     # ports:
+    #     #   - "8000:3000"
+    #     env_file:
+    #         - default.env
+    #     volumes:
+    #         - ./deans-notification:/work
+    #     networks:
+    #         - notification_network
 
-  frontend:
-    build: ./deans-frontend
-    ports:
-    - "3000:3000"
-    expose:
-      - 3000
-    volumes:
-     - ./deans-frontend:/work/
-    command: bash -c "yarn install; yarn start"
-    networks: 
-    #   - frontend_network
-      - nginx_network
+    frontend:
+        build: ./deans-frontend
+        ports:
+            - "3000:3000"
+        expose:
+            - 3000
+        volumes:
+            - ./deans-frontend:/work/
+        command: bash -c "yarn install; yarn start"
+        networks:
+            # - frontend_network
+            - nginx_network
 
-  nginx:
-    build:
-      context: ./nginx
-    image: nginx:1.13
-    ports:
-      - 8000:80
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - static_volume:/static-django
-    env_file:
-      - default.env
-    depends_on:
-      - web
-      # - frontend
-      # - node
-    networks:
-      - nginx_network
-#   cron:
-#     image: python:3.6
-#     command: bash -c "python3 /cron/cron.py"
-#     env_file:
-#       - default.env
-#     volumes:
-#       - ./cron:/cron
-#       - ./deans-api/deans_api:/work/deans-api/deans_api
-#     depends_on:
-#       - web
-#     networks:
-#       - notification_network
-#       - db_network
+    nginx:
+        build:
+            context: ./nginx
+        image: nginx:1.13
+        ports:
+            - 8000:80
+        volumes:
+            - ./nginx/conf.d:/etc/nginx/conf.d
+            - static_volume:/static-django
+        env_file:
+            - default.env
+        depends_on:
+            - web
+            # - frontend
+            # - node
+        networks:
+            - nginx_network
+    # cron:
+    #     image: python:3.6
+    #     command: bash -c "python3 /cron/cron.py"
+    #     env_file:
+    #         - default.env
+    #     volumes:
+    #         - ./cron:/cron
+    #         - ./deans-api/deans_api:/work/deans-api/deans_api
+    #     depends_on:
+    #         - web
+    #     networks:
+    #         - notification_network
+    #         - db_network
 
 volumes:
-  static_volume:
-
-
+    static_volume:
