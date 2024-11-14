@@ -1,9 +1,9 @@
 [submodule "deans-api"]
 	path = deans-api
-	url = https://github.com/Deans-CMS/deans-api
+	url = https://github.com/NKSL2001/deans-api.git
 [submodule "deans-frontend"]
 	path = deans-frontend
-	url = https://github.com/Deans-CMS/deans-frontend
+	url = https://github.com/NKSL2001/deans-frontend.git
 [submodule "deans-notification"]
 	path = deans-notification
-	url = https://github.com/Deans-CMS/deans-notification.git
+	url = https://github.com/NKSL2001/deans-notification.git
